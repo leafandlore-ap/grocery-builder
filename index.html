@@ -3,301 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy-Safe Local Recipe & Grocery Planner</title>
+    <title>Local Recipe Grocery Builder</title>
     <style>
-        @import url('https://googleapis.com');
-        
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: #f9fafb; color: #1f2937; min-height: 100vh; padding: 2rem 1rem; }
-        .max-w-6xl { max-w: 72rem; margin: 0 auto; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; border-b: 1px solid #e5e7eb; padding-bottom: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
-        h1 { font-size: 1.875rem; font-weight: 700; color: #111827; }
-        .text-gray-500 { color: #6b7280; font-size: 0.875rem; margin-top: 0.25rem; }
-        
-        .btn { padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; border-radius: 0.5rem; cursor: pointer; transition: background 0.2s; border: 1px solid #d1d5db; background: white; color: #374151; }
-        .btn:hover { background: #f9fafb; }
-        .btn-primary { background: #2563eb; color: white; border: none; width: 100%; padding: 0.625rem; font-weight: 600; border-radius: 0.5rem; cursor: pointer; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-dark { background: #111827; color: white; width: 100%; border: none; padding: 0.5rem; margin-top: 1rem; font-weight: 500; border-radius: 0.5rem; cursor: pointer; }
-        .btn-dark:hover { background: #000; }
-        
-        .grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-        @media (min-width: 1024px) { .grid { grid-template-columns: 2fr 1fr; } }
-        .recipes-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1rem; }
-        @media (min-width: 640px) { .recipes-grid { grid-template-columns: 1fr 1fr; } }
-        
-        .card { background: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-        .sticky { position: relative; }
-        @media (min-width: 1024px) { .sticky { position: sticky; top: 1.5rem; } }
-        
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; font-size: 0.875rem; color: #374151; margin-bottom: 0.25rem; font-weight: 500; }
-        input[type="text"], textarea { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem; }
-        input:focus, textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.2); }
-        .hint { font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.5rem; line-height: 1.25rem; }
-        
-        .recipe-item { border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1rem; background: white; display: flex; flex-direction: column; justify-content: space-between; }
-        .recipe-item.active { border-color: #2563eb; background-color: rgba(37,99,235,0.02); }
-        .recipe-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.5rem; }
-        .recipe-label { display: flex; align-items: center; gap: 0.75rem; font-weight: 600; cursor: pointer; }
-        .delete-btn { background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 0.875rem; }
-        .delete-btn:hover { color: #dc2626; }
-        
-        .grocery-item { display: flex; justify-content: space-between; align-items: center; padding: 0.625rem 0; border-bottom: 1px solid #f3f4f6; }
-        .badge { font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.625rem; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 9999px; color: #4b5563; text-transform: lowercase; }
-        .empty-state { text-align: center; padding: 3rem 1rem; color: #9ca3af; border: 2px dashed #f3f4f6; border-radius: 0.5rem; font-size: 0.875rem; }
-        .hidden { display: none !important; }
-        ul { list-style-type: none; }
-        .pl-5 { padding-left: 1.25rem; list-style-type: disc; color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;}
-        
-        .privacy-banner { background-color: #fef3c7; border: 1px solid #fcd34d; color: #92400e; padding: 0.75rem 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.875rem; line-height: 1.25rem; }
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --accent-color: #2c7a7b;
+            --accent-hover: #236162;
+            --border-color: #e2e8f0;
+            --danger-color: #e53e3e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c53030;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .ingredient-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.5fr auto;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .recipe-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .recipe-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .recipe-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            flex-grow: 1;
+        }
+
+        .recipe-info input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .grocery-item {
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 1.05rem;
+        }
+
+        .file-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        #importInput {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-    <div class="max-w-6xl">
-        <header>
-            <div>
-                <h1>Meal Planner & Grocery Aggregator</h1>
-                <p class="text-gray-500">Privacy-Isolated Mode: Fully optimized for Zen & Firefox tracking setups.</p>
-            </div>
-            <div>
-                <button onclick="exportData()" class="btn">Download Recipe File</button>
-                <label class="btn" style="display:inline-block; position:relative; overflow:hidden;">
-                    Upload Recipe File
-                    <input type="file" id="importFile" onchange="importData(event)" style="position:absolute; top:0; left:0; opacity:0; cursor:pointer;">
-                </label>
-            </div>
-        </header>
+<div class="container">
+    <header>
+        <h1>🛒 Grocery Planner</h1>
+        <div class="file-buttons">
+            <button class="btn btn-outline" onclick="exportRecipes()">Export JSON</button>
+            <button class="btn btn-outline" onclick="document.getElementById('importInput').click()">Import JSON</button>
+            <input type="file" id="importInput" accept=".json" onchange="importRecipes(event)">
+        </div>
+    </header>
 
-        <div class="privacy-banner">
-            <strong>🔒 Strict Privacy Mode Active:</strong> To comply with Zen/Firefox security settings, data does not write to tracking spaces. Add your recipes below, then click <strong>"Download Recipe File"</strong> to save your layout permanently. Simply click <strong>"Upload Recipe File"</strong> whenever you open the link on your computer or phone to restore them instantly!
+    <!-- Left Column: Add & Select Recipes -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        <!-- Add Recipe Card -->
+        <div class="card">
+            <h2>Add New Recipe</h2>
+            <div class="form-group">
+                <label for="recipeName">Recipe Name</label>
+                <input type="text" id="recipeName" placeholder="e.g., Spaghetti Carbonara">
+            </div>
+            
+            <label>Ingredients</label>
+            <div id="ingredientInputsContainer">
+                <div class="ingredient-row">
+                    <input type="text" placeholder="Ingredient Name (e.g., Bell Pepper)" class="ing-name">
+                    <input type="number" step="any" placeholder="Qty" class="ing-qty">
+                    <input type="text" placeholder="Unit (e.g., whole, oz)" class="ing-unit">
+                    <button class="btn btn-danger" onclick="this.parentElement.remove()">X</button>
+                </div>
+            </div>
+            
+            <button class="btn btn-outline" style="margin-top: 5px; width: 100%;" onclick="addIngredientRow()">+ Add Ingredient Line</button>
+            <button class="btn" style="margin-top: 15px; width: 100%;" onclick="saveRecipe()">Save Recipe</button>
         </div>
 
-        <div class="grid">
-            <div>
-                <section class="card">
-                    <h2 style="font-size:1.25rem; margin-bottom:1rem;">Add New Recipe</h2>
-                    <form id="recipeForm" onsubmit="saveRecipe(event)">
-                        <div class="form-group">
-                            <label>Recipe Name</label>
-                            <input type="text" id="recipeName" required placeholder="e.g., Spaghetti Bolognese">
-                        </div>
-                        <div class="form-group">
-                            <label>Ingredients</label>
-                            <p class="hint">Type one ingredient per line. Start with a number if there is a quantity.<br>Examples: "2 green bell pepper", "1 tbsp olive oil", "500 g minced beef"</p>
-                            <textarea id="recipeIngredients" required rows="5" placeholder="2 green bell pepper&#10;1 tbsp olive oil&#10;500 g chicken breast"></textarea>
-                        </div>
-                        <button type="submit" class="btn-primary">Add to Active Session</button>
-                    </form>
-                </section>
-
-                <section style="margin-top:2rem;">
-                    <h2 style="font-size:1.25rem;">Select Meals for the Week</h2>
-                    <div id="recipesContainer" class="recipes-grid"></div>
-                </section>
-            </div>
-
-            <div>
-                <div class="card sticky">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                        <h2 style="font-size:1.25rem;">Grocery List</h2>
-                        <button onclick="clearSelection()" style="background:none; border:none; color:#6b7280; font-size:0.75rem; cursor:pointer;">Clear Plan</button>
-                    </div>
-                    
-                    <div id="emptyGroceryState" class="empty-state">
-                        Select meals on the left to automatically combine matching ingredients!
-                    </div>
-
-                    <div id="groceryListContent" class="hidden">
-                        <ul id="groceryItems"></ul>
-                        <button onclick="window.print()" class="btn-dark">Print List</button>
-                    </div>
-                </div>
+        <!-- Recipe Inventory Card -->
+        <div class="card">
+            <h2>Your Meals</h2>
+            <div id="recipeList">
+                <!-- Recipes inject here -->
             </div>
         </div>
     </div>
 
-    <script>
-        // Completely bypass storage engines to stop Firefox/Zen security faults
-        let allRecipes = [];
-        let selectedRecipeIds = new Set();
+    <!-- Right Column: Generated Grocery List -->
+    <div class="card" style="position: sticky; top: 20px;">
+        <h2>Weekly Grocery List</h2>
+        <div id="groceryListContainer" style="margin-top: 15px;">
+            <!-- Aggregated list item elements inject here -->
+        </div>
+    </div>
+</div>
 
-        // Safe initial render run
+<script>
+    // Robust data layer using localStorage (persistent across browser reloads)
+    let recipes = [];
+    let selectedRecipeIds = new Set();
+
+    // Initialize application state on window load
+    window.addEventListener('DOMContentLoaded', () => {
+        loadDataFromStorage();
         renderRecipes();
-        calculateGroceries();
+        updateGroceryList();
+    });
 
-        function saveRecipe(event) {
-            event.preventDefault();
-            const name = document.getElementById("recipeName").value.trim();
-            const rawIngredients = document.getElementById("recipeIngredients").value.split('\n');
-            
-            const ingredients = rawIngredients
-                .map(line => parseIngredientLine(line))
-                .filter(item => item !== null);
+    function loadDataFromStorage() {
+        try {
+            const stored = localStorage.getItem('local_recipe_manager_data');
+            recipes = stored ? JSON.parse(stored) : [];
+        } catch (e) {
+            console.error("Failed to parse data from localStorage", e);
+            recipes = [];
+        }
+    }
 
-            const recipe = { id: Date.now(), name, ingredients };
-            
-            allRecipes.push(recipe);
+    function saveDataToStorage() {
+        localStorage.setItem('local_recipe_manager_data', JSON.stringify(recipes));
+    }
 
-            document.getElementById("recipeForm").reset();
-            renderRecipes();
-            calculateGroceries();
+    function addIngredientRow() {
+        const container = document.getElementById('ingredientInputsContainer');
+        const row = document.createElement('div');
+        row.className = 'ingredient-row';
+        row.innerHTML = `
+            <input type="text" placeholder="Ingredient Name" class="ing-name">
+            <input type="number" step="any" placeholder="Qty" class="ing-qty">
+            <input type="text" placeholder="Unit" class="ing-unit">
+            <button class="btn btn-danger" onclick="this.parentElement.remove()">X</button>
+        `;
+        container.appendChild(row);
+    }
+
+    function saveRecipe() {
+        const nameInput = document.getElementById('recipeName');
+        const name = nameInput.value.trim();
+        if (!name) {
+            alert('Please enter a recipe name.');
+            return;
         }
 
-        function parseIngredientLine(line) {
-            line = line.trim();
-            if (!line) return null;
+        const rows = document.querySelectorAll('.ingredient-row');
+        const ingredients = [];
 
-            // Safe split layout logic built without standard internal trim overrides
-            const cleanLine = line.replace(/\s+/g, ' ');
-            const match = cleanLine.match(/^([0-9\/\.\s½⅓¼¾]+)?\s*(.*)$/);
-            
-            let quantityStr = "1";
-            let remainder = line;
+        rows.forEach(row => {
+            const ingName = row.querySelector('.ing-name').value.trim().toLowerCase();
+            const qty = parseFloat(row.querySelector('.ing-qty').value) || 0;
+            const unit = row.querySelector('.ing-unit').value.trim().toLowerCase();
 
-            if (match) {
-                if (match[1]) quantityStr = match[1];
-                if (match[2]) remainder = match[2];
+            if (ingName) {
+                ingredients.push({ name: ingName, qty, unit });
             }
+        });
 
-            let quantity = parseQuantity(quantityStr.trim());
+        if (ingredients.length === 0) {
+            alert('Please add at least one ingredient.');
+            return;
+        }
 
-            const units = ['g', 'kg', 'lb', 'oz', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'cups', 'can', 'cans', 'pack', 'packs', 'clove', 'cloves', 'slice', 'slices', 'bag', 'bags'];
-            const tokens = remainder.split(' ');
-            let unit = "";
-            let name = remainder;
+        const newRecipe = {
+            id: Date.now().toString(),
+            name: name,
+            ingredients: ingredients
+        };
 
-            if (tokens.length > 1 && units.includes(tokens[0].toLowerCase())) {
-                unit = tokens[0].toLowerCase();
-name = tokens.slice(1).join(" ");
-}
-return {
-quantity: quantity,
-unit: unit,
-name: name.toLowerCase().trim()
-};
-}
-function parseQuantity(str) {
-if (!str) return 1;
-const fractionMap = { '½': 0.5, '⅓': 0.33, '¼': 0.25, '¾': 0.75 };
-if (fractionMap[str]) return fractionMap[str];
-if (str.includes('/')) {
-const parts = str.split('/');
-if(parts.length === 2) return parseFloat(parts[0]) / parseFloat(parts[1]);
-}
-const val = parseFloat(str);
-return isNaN(val) ? 1 : val;
-}
-function renderRecipes() {
-const container = document.getElementById("recipesContainer");
-if (allRecipes.length === 0) {
-container.innerHTML =  <div style="grid-column: span 2; text-align: center; padding: 2rem; color: #9ca3af; background: white; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-size:0.875rem;"> No meals added yet. Use the form above to add your first recipe! </div>;
+        recipes.push(newRecipe);
+        saveDataToStorage();
+        
+        // Reset Inputs
+        nameInput.value = '';
+        document.getElementById('ingredientInputsContainer').innerHTML = '';
+        addIngredientRow(); // Add back one clean starter row
+        
+        renderRecipes();
+        updateGroceryList();
+    }
+
+    function deleteRecipe(id, event) {
+        event.stopPropagation(); // Stop trigger toggles when deleting
+        recipes = recipes.filter(r => r.id !== id);
+        selectedRecipeIds.delete(id);
+        saveDataToStorage();
+        renderRecipes();
+        updateGroceryList();
+    }
+
+    function toggleRecipeSelect(id) {
+        if (selectedRecipeIds.has(id)) {
+            selectedRecipeIds.delete(id);
+        } else {
+            selectedRecipeIds.add(id);
+        }
+        updateGroceryList();
+    }
+
+    function renderRecipes() {
+        const listContainer = document.getElementById('recipeList');
+        listContainer.innerHTML = '';
+
+        if (recipes.length === 0) {
+listContainer.innerHTML = 'No recipes saved yet.';
 return;
 }
-container.innerHTML = allRecipes.map(recipe => {
+recipes.forEach(recipe => {
 const isChecked = selectedRecipeIds.has(recipe.id) ? 'checked' : '';
-const activeClass = selectedRecipeIds.has(recipe.id) ? 'active' : '';
-return `
-
-
-✕
-
-
-${recipe.ingredients.map(ing => <li>${cleanQuantity(ing.quantity)} ${ing.unit} ${escapeHTML(ing.name)}</li>).join('')}
-
-
-
-`;
-}).join('');
+const item = document.createElement('div');
+item.className = 'recipe-list-item';
+item.innerHTML = <div class="recipe-info" onclick="toggleRecipeSelect('${recipe.id}'); document.getElementById('check-${recipe.id}').checked = !document.getElementById('check-${recipe.id}').checked"> <input type="checkbox" id="check-${recipe.id}" ${isChecked} onclick="event.stopPropagation(); toggleRecipeSelect('${recipe.id}')"> <span>${escapeHtml(recipe.name)}</span> </div> <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8rem;" onclick="deleteRecipe('${recipe.id}', event)">Delete</button>;
+listContainer.appendChild(item);
+});
 }
-function toggleRecipeSelection(id) {
-if (selectedRecipeIds.has(id)) {
-selectedRecipeIds.delete(id);
-} else {
-selectedRecipeIds.add(id);
-}
-renderRecipes();
-calculateGroceries();
-}
-function deleteRecipe(id) {
-allRecipes = allRecipes.filter(r => r.id !== id);
-selectedRecipeIds.delete(id);
-renderRecipes();
-calculateGroceries();
-}
-function clearSelection() {
-selectedRecipeIds.clear();
-renderRecipes();
-calculateGroceries();
-}
-function calculateGroceries() {
-const masterList = {};
-allRecipes.forEach(recipe => {
+function updateGroceryList() {
+const container = document.getElementById('groceryListContainer');
+container.innerHTML = '';
+// Map key format: "ingredient_name|unit" -> total quantity
+const aggregatedIngredients = {};
+recipes.forEach(recipe => {
 if (selectedRecipeIds.has(recipe.id)) {
-recipe.ingredients.forEach(item => {
-const key = ${item.unit}_${item.name};
-if (masterList[key]) {
-masterList[key].quantity += item.quantity;
+recipe.ingredients.forEach(ing => {
+const key = ${ing.name}|${ing.unit};
+if (aggregatedIngredients[key]) {
+aggregatedIngredients[key] += ing.qty;
 } else {
-masterList[key] = { ...item };
+aggregatedIngredients[key] = ing.qty;
 }
 });
 }
 });
-const items = Object.values(masterList);
-const emptyState = document.getElementById("emptyGroceryState");
-const contentState = document.getElementById("groceryListContent");
-const listUl = document.getElementById("groceryItems");
-if (items.length === 0) {
-emptyState.classList.remove("hidden");
-contentState.classList.add("hidden");
-} else {
-emptyState.classList.add("hidden");
-contentState.classList.remove("hidden");
-listUl.innerHTML = items.map(item => `
-${cleanQuantity(item.quantity)} ${item.unit}
-
-`).join('');
-}
-}
-function cleanQuantity(num) {
-return Number(num.toFixed(2)).toString();
-}
-function escapeHTML(str) {
-return str.replace(/[&<>'"]/g, tag => ({ '&': '&', '<': '<', '>': '>', "'": ''', '"': '"' }[tag] || tag));
-}
-function exportData() {
-if (allRecipes.length === 0) {
-alert("Please add at least one recipe before downloading.");
+const keys = Object.keys(aggregatedIngredients);
+if (keys.length === 0) {
+container.innerHTML = 'Select meals to dynamically build your list.';
 return;
 }
-const blob = new Blob([JSON.stringify(allRecipes, null, 2)], { type: "application/json" });
-const url = URL.createObjectURL(blob);
+keys.sort().forEach(key => {
+const [name, unit] = key.split('|');
+const totalQty = aggregatedIngredients[key];
+const itemDiv = document.createElement('div');
+itemDiv.className = 'grocery-item';
+// Format string output clearly based on values provided
+const qtyStr = totalQty > 0 ? ${parseFloat(totalQty.toFixed(2))}  : '';
+const unitStr = unit ? ${unit}  : '';
+itemDiv.textContent = • ${qtyStr}${unitStr}${capitalizeFirstLetter(name)};
+container.appendChild(itemDiv);
+});
+}
+// Export state data structure directly to native filesystem download
+function exportRecipes() {
+if (recipes.length === 0) {
+alert('No recipes available to export.');
+return;
+}
+const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(recipes, null, 2));
 const downloadAnchor = document.createElement('a');
-downloadAnchor.href = url;
-downloadAnchor.download = "recipe_planner_backup.json";
+downloadAnchor.setAttribute("href", dataStr);
+downloadAnchor.setAttribute("download", "recipe_backup.json");
 document.body.appendChild(downloadAnchor);
 downloadAnchor.click();
-document.body.removeChild(downloadAnchor);
-URL.revokeObjectURL(url);
+downloadAnchor.remove();
 }
-function importData(event) {
+// Import and parse validated data structure safely back into storage context
+function importRecipes(event) {
 const file = event.target.files[0];
 if (!file) return;
 const reader = new FileReader();
 reader.onload = function(e) {
 try {
-const imported = JSON.parse(e.target.result);
-if (!Array.isArray(imported)) throw new Error();
-allRecipes = imported;
-alert("Recipes uploaded successfully!");
+const importedData = JSON.parse(e.target.result);
+if (Array.isArray(importedData)) {
+// Simple alignment check to ensure data structure compatibility
+recipes = importedData;
+selectedRecipeIds.clear();
+saveDataToStorage();
 renderRecipes();
-calculateGroceries();
+updateGroceryList();
+alert('Recipes imported successfully!');
+} else {
+alert('Invalid file structure. Expected an array of recipes.');
+}
 } catch (err) {
-alert("Error reading file layout. Make sure it is a valid backup json.");
+alert('Failed to parse file. Ensure it is a valid JSON file.');
 }
 };
 reader.readAsText(file);
+// Clear value so the same file can be chosen repeatedly if fixed
+event.target.value = '';
+}
+function capitalizeFirstLetter(string) {
+return string.charAt(0).toUpperCase() + string.slice(1);
+}
+function escapeHtml(str) {
+return str.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, """).replace(/'/g, "'");
 }
