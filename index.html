@@ -1,434 +1,528 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Recipe Grocery Builder</title>
-    <style>
-        :root {
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --accent-color: #2c7a7b;
-            --accent-hover: #236162;
-            --border-color: #e2e8f0;
-            --danger-color: #e53e3e;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 20px;
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        header {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        h1, h2 {
-            color: var(--accent-color);
-            margin-bottom: 10px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            height: fit-content;
-        }
-
-        .btn {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .btn:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .btn-danger {
-            background-color: var(--danger-color);
-        }
-
-        .btn-danger:hover {
-            background-color: #c53030;
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-        }
-
-        .btn-outline:hover {
-            background-color: var(--accent-color);
-            color: white;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        .ingredient-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1.5fr auto;
-            gap: 8px;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-
-        .recipe-list-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .recipe-list-item:last-child {
-            border-bottom: none;
-        }
-
-        .recipe-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            flex-grow: 1;
-        }
-
-        .recipe-info input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .grocery-item {
-            padding: 6px 0;
-            border-bottom: 1px dashed var(--border-color);
-            font-size: 1.05rem;
-        }
-
-        .file-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        #importInput {
-            display: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grocery Planner</title>
+<style>
+:root {
+  --bg: #f4f7f6;
+  --card: #fff;
+  --text: #333;
+  --accent: #2c7a7b;
+  --hover: #236162;
+  --border: #e2e8f0;
+  --danger: #e53e3e;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 20px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+.container {
+  max-width: 1050px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+header {
+  grid-column: 1 / -1;
+  background: var(--card);
+  padding: 16px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+h1, h2 {
+  color: var(--accent);
+  margin: 0 0 14px;
+}
+h1 { font-size: 1.7rem; margin: 0; }
+h2 { font-size: 1.3rem; }
+.card {
+  background: var(--card);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 4px #0001;
+}
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+button {
+  border: 0;
+  background: var(--accent);
+  color: white;
+  padding: 9px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .9rem;
+}
+button:hover { background: var(--hover); }
+button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.outline {
+  background: white;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.outline:hover { color: white; }
+.danger { background: var(--danger); }
+.danger:hover { background: #c53030; }
+.small { padding: 5px 9px; font-size: .8rem; }
+.full { width: 100%; margin-top: 12px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+label.field-label {
+  display: block;
+  font-weight: 600;
+  margin: 12px 0 5px;
+}
+input[type="text"], input[type="number"] {
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font: inherit;
+}
+.ingredient-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.2fr auto;
+  gap: 7px;
+  margin: 8px 0;
+  align-items: center;
+}
+.recipe-row, .grocery-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.recipe-row label, .grocery-row label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.checked-text {
+  text-decoration: line-through;
+  color: #999;
+}
+.grocery-row:has(input:checked) {
+  opacity: .65;
+}
+.muted { color: #777; font-size: .9rem; }
+.section-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+#notice { margin-top: 10px; color: var(--accent); }
+#importInput { display: none; }
+@media(max-width: 750px) {
+  .container { grid-template-columns: 1fr; }
+}
+@media(max-width: 440px) {
+  .ingredient-row {
+    grid-template-columns: 1fr 1fr auto;
+  }
+  .ingredient-row .ing-name {
+    grid-column: 1 / -1;
+  }
+}
+</style>
 </head>
 <body>
-
 <div class="container">
-    <header>
-        <h1>🛒 Grocery Planner</h1>
-        <div class="file-buttons">
-            <button class="btn btn-outline" id="exportBtn">Export JSON</button>
-            <button class="btn btn-outline" id="importTriggerBtn">Import JSON</button>
-            <input type="file" id="importInput" accept=".json">
-        </div>
-    </header>
-
-    <div style="display: flex; flex-direction: column; gap: 20px;">
-        <!-- Add Recipe Card -->
-        <div class="card">
-            <h2>Add New Recipe</h2>
-            <div class="form-group">
-                <label for="recipeName">Recipe Name</label>
-                <input type="text" id="recipeName" placeholder="e.g., Spaghetti Carbonara">
-            </div>
-            
-            <label>Ingredients</label>
-            <div id="ingredientInputsContainer">
-                <!-- Initial row will be automatically injected by JS -->
-            </div>
-            
-            <button class="btn btn-outline" style="margin-top: 10px; width: 100%;" id="addIngredientBtn">+ Add Ingredient Line</button>
-            <button class="btn" style="margin-top: 15px; width: 100%;" id="saveRecipeBtn">Save Recipe</button>
-        </div>
-
-        <!-- Recipe Inventory Card -->
-        <div class="card">
-            <h2>Your Meals</h2>
-            <div id="recipeList"></div>
-        </div>
+  <header>
+    <h1>🛒 Grocery Planner</h1>
+    <div class="actions">
+      <button class="outline" id="exportBtn">Export JSON</button>
+      <button class="outline" id="importBtn">Import JSON</button>
+      <input type="file" id="importInput" accept=".json">
     </div>
+  </header>
 
-    <!-- Right Column: Generated Grocery List -->
-    <div class="card" style="position: sticky; top: 20px;">
-        <h2>Weekly Grocery List</h2>
-        <div id="groceryListContainer" style="margin-top: 15px;"></div>
+  <div class="left-column">
+    <section class="card">
+      <h2>Add New Recipe</h2>
+      <label class="field-label" for="recipeName">Recipe Name</label>
+      <input id="recipeName" type="text"
+        placeholder="e.g., Spaghetti Carbonara">
+
+      <label class="field-label">Ingredients</label>
+      <div id="ingredientInputs"></div>
+
+      <button class="outline full" id="addIngredientBtn">
+        + Add Ingredient Line
+      </button>
+      <button class="full" id="saveRecipeBtn">
+        Save Recipe
+      </button>
+      <div id="notice" role="status"></div>
+    </section>
+
+    <section class="card">
+      <h2>Your Meals</h2>
+      <div id="recipeList"></div>
+    </section>
+  </div>
+
+  <section class="card" style="align-self:start">
+    <h2>Weekly Grocery List</h2>
+    <div class="section-footer">
+      <span class="muted" id="groceryCount">0 items</span>
+      <button class="outline small" id="clearChecksBtn">
+        Reset Checkmarks
+      </button>
     </div>
+    <div id="groceryList"></div>
+  </section>
 </div>
 
 <script>
-    let recipes = [];
-    let selectedRecipeIds = [];
+"use strict";
 
-    // Core Setup & Event Attaching
-    document.addEventListener('DOMContentLoaded', () => {
-        loadDataFromStorage();
-        
-        // Explicitly attach events to buttons to guarantee they fire
-        document.getElementById('addIngredientBtn').addEventListener('click', () => addIngredientRow());
-        document.getElementById('saveRecipeBtn').addEventListener('click', saveRecipe);
-        document.getElementById('exportBtn').addEventListener('click', exportRecipes);
-        
-        const fileInput = document.getElementById('importInput');
-        document.getElementById('importTriggerBtn').addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', importRecipes);
+const STORAGE_KEY = "local_recipe_manager_data";
+const CHECKS_KEY = "grocery_planner_checked_items";
 
-        // Inject initial blank ingredient line
-        addIngredientRow();
-        renderRecipes();
-        updateGroceryList();
+let recipes = [];
+let selectedIds = new Set();
+let checkedItems = new Set();
+
+const el = id => document.getElementById(id);
+
+function loadData() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    recipes = Array.isArray(saved) ? saved : [];
+    const checks = JSON.parse(localStorage.getItem(CHECKS_KEY) || "[]");
+    checkedItems = new Set(Array.isArray(checks) ? checks : []);
+  } catch (error) {
+    console.error("Unable to load saved data:", error);
+    recipes = [];
+    checkedItems = new Set();
+  }
+}
+
+function persist() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+    localStorage.setItem(CHECKS_KEY, JSON.stringify([...checkedItems]));
+  } catch (error) {
+    alert("Browser storage is unavailable. Export your recipes to back them up.");
+  }
+}
+
+function addIngredientRow() {
+  const row = document.createElement("div");
+  row.className = "ingredient-row";
+  row.innerHTML = `
+    <input class="ing-name" type="text"
+      placeholder="Ingredient" aria-label="Ingredient name">
+    <input class="ing-qty" type="number"
+      step="any" min="0" placeholder="Qty" aria-label="Quantity">
+    <input class="ing-unit" type="text"
+      placeholder="Unit" aria-label="Unit">
+    <button class="danger small" type="button"
+      aria-label="Remove ingredient">X</button>
+  `;
+  row.querySelector("button").addEventListener("click", () => {
+    if (el("ingredientInputs").children.length > 1) {
+      row.remove();
+    } else {
+      row.querySelectorAll("input").forEach(input => input.value = "");
+    }
+  });
+  el("ingredientInputs").appendChild(row);
+}
+
+function saveRecipe() {
+  const name = el("recipeName").value.trim();
+  if (!name) {
+    alert("Please enter a recipe name.");
+    return;
+  }
+
+  const ingredients = [];
+  const rows = el("ingredientInputs").querySelectorAll(".ingredient-row");
+
+  for (const row of rows) {
+    const ingredientName = row.querySelector(".ing-name").value.trim();
+    const rawQty = row.querySelector(".ing-qty").value.trim();
+    const unit = row.querySelector(".ing-unit").value.trim();
+
+    if (!ingredientName) continue;
+
+    const qty = rawQty === "" ? 0 : Number(rawQty);
+    if (!Number.isFinite(qty) || qty < 0) {
+      alert("Please enter a valid quantity for " + ingredientName);
+      return;
+    }
+
+    ingredients.push({
+      name: ingredientName.toLowerCase(),
+      qty,
+      unit: unit.toLowerCase()
+    });
+  }
+
+  if (!ingredients.length) {
+    alert("Please enter at least one ingredient.");
+    return;
+  }
+
+  recipes.push({
+    id: crypto.randomUUID ? crypto.randomUUID() :
+      Date.now() + "-" + Math.random(),
+    name,
+    ingredients
+  });
+
+  persist();
+  el("recipeName").value = "";
+  el("ingredientInputs").innerHTML = "";
+  addIngredientRow();
+  el("notice").textContent = "Recipe saved!";
+  renderRecipes();
+  renderGroceryList();
+}
+
+function renderRecipes() {
+  const container = el("recipeList");
+  container.replaceChildren();
+
+  if (!recipes.length) {
+    container.textContent = "No recipes saved yet.";
+    return;
+  }
+
+  recipes.forEach(recipe => {
+    const row = document.createElement("div");
+    row.className = "recipe-row";
+
+    const label = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = selectedIds.has(String(recipe.id));
+
+    checkbox.addEventListener("change", () => {
+      const id = String(recipe.id);
+      if (checkbox.checked) selectedIds.add(id);
+      else selectedIds.delete(id);
+      renderGroceryList();
     });
 
-    function loadDataFromStorage() {
-        try {
-            const stored = localStorage.getItem('local_recipe_manager_data');
-            recipes = stored ? JSON.parse(stored) : [];
-        } catch (e) {
-            recipes = [];
-        }
-    }
+    const text = document.createElement("span");
+    text.textContent = recipe.name;
+    label.append(checkbox, text);
 
-    function saveDataToStorage() {
-        localStorage.setItem('local_recipe_manager_data', JSON.stringify(recipes));
-    }
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "danger small";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", () => {
+      if (!confirm('Delete "' + recipe.name + '"?')) return;
+      recipes = recipes.filter(r => String(r.id) !== String(recipe.id));
+      selectedIds.delete(String(recipe.id));
+      persist();
+      renderRecipes();
+      renderGroceryList();
+    });
 
-    function addIngredientRow() {
-        const container = document.getElementById('ingredientInputsContainer');
-        const row = document.createElement('div');
-        row.className = 'ingredient-row';
-        row.innerHTML = `
-            <input type="text" placeholder="Ingredient Name" class="ing-name">
-            <input type="number" step="any" placeholder="Qty" class="ing-qty">
-            <input type="text" placeholder="Unit" class="ing-unit">
-            <button class="btn btn-danger remove-row-btn">X</button>
-        `;
-        
-        // Attach delete logic explicitly to the row button
-        row.querySelector('.remove-row-btn').addEventListener('click', () => {
-            row.remove();
-        });
-        
-        container.appendChild(row);
-    }
-
-    function saveRecipe() {
-        const nameInput = document.getElementById('recipeName');
-        const name = nameInput.value.trim();
-        if (!name) {
-            alert('Please enter a recipe name.');
-            return;
-        }
-
-        const rows = document.querySelectorAll('.ingredient-row');
-        const ingredients = [];
-
-        rows.forEach(row => {
-            const ingName = row.querySelector('.ing-name').value.trim().toLowerCase();
-            const qty = parseFloat(row.querySelector('.ing-qty').value) || 0;
-            const unit = row.querySelector('.ing-unit').value.trim().toLowerCase();
-
-            if (ingName) {
-                ingredients.push({ name: ingName, qty, unit });
-            }
-        });
-
-        if (ingredients.length === 0) {
-            alert('Please add at least one ingredient.');
-            return;
-        }
-
-        const newRecipe = {
-            id: Date.now().toString(),
-            name: name,
-            ingredients: ingredients
-        };
-
-        recipes.push(newRecipe);
-        saveDataToStorage();
-        
-        // Reset Inputs
-        nameInput.value = '';
-        document.getElementById('ingredientInputsContainer').innerHTML = '';
-        addIngredientRow(); 
-        
-        renderRecipes();
-        updateGroceryList();
-    }
-
-    function deleteRecipe(id) {
-        recipes = recipes.filter(r => r.id !== id);
-        selectedRecipeIds = selectedRecipeIds.filter(selectedId => selectedId !== id);
-        saveDataToStorage();
-        renderRecipes();
-        updateGroceryList();
-    }
-
-    function toggleRecipeSelect(id) {
-        if (selectedRecipeIds.includes(id)) {
-            selectedRecipeIds = selectedRecipeIds.filter(selectedId => selectedId !== id);
-        } else {
-            selectedRecipeIds.push(id);
-        }
-        updateGroceryList();
-    }
-
-    function renderRecipes() {
-        const listContainer = document.getElementById('recipeList');
-        listContainer.innerHTML = '';
-
-        if (recipes.length === 0) {
-listContainer.innerHTML = 'No recipes saved yet.';
-return;
+    row.append(label, deleteBtn);
+    container.appendChild(row);
+  });
 }
-recipes.forEach(recipe => {
-const isChecked = selectedRecipeIds.includes(recipe.id);
-const item = document.createElement('div');
-item.className = 'recipe-list-item';
-item.innerHTML = <div class="recipe-info"> <input type="checkbox" class="recipe-checkbox" ${isChecked ? 'checked' : ''}> <span>${escapeHtml(recipe.name)}</span> </div> <button class="btn btn-danger delete-recipe-btn" style="padding: 4px 8px; font-size: 0.8rem;">Delete</button>;
-// Isolated event listening to fix previous click bubble bugs
-item.querySelector('.recipe-info').addEventListener('click', (e) => {
-if (e.target.type !== 'checkbox') {
-const cb = item.querySelector('.recipe-checkbox');
-cb.checked = !cb.checked;
+
+function ingredientKey(name, unit) {
+  return JSON.stringify([
+    String(name).trim().toLowerCase(),
+    String(unit).trim().toLowerCase()
+  ]);
 }
-toggleRecipeSelect(recipe.id);
-});
-item.querySelector('.delete-recipe-btn').addEventListener('click', () => {
-deleteRecipe(recipe.id);
-});
-listContainer.appendChild(item);
-});
+
+function renderGroceryList() {
+  const container = el("groceryList");
+  container.replaceChildren();
+
+  const totals = new Map();
+
+  recipes.forEach(recipe => {
+    if (!selectedIds.has(String(recipe.id))) return;
+
+    (recipe.ingredients || []).forEach(ingredient => {
+      const name = String(ingredient.name || "").trim().toLowerCase();
+      const unit = String(ingredient.unit || "").trim().toLowerCase();
+      const qty = Number(ingredient.qty) || 0;
+      if (!name) return;
+
+      const key = ingredientKey(name, unit);
+      totals.set(key, (totals.get(key) || 0) + qty);
+    });
+  });
+
+  const sorted = [...totals.entries()].sort((a, b) =>
+    a[0].localeCompare(b[0])
+  );
+
+  const checkedCount = sorted.filter(([key]) =>
+    checkedItems.has(key)
+  ).length;
+
+  el("groceryCount").textContent =
+    checkedCount + " of " + sorted.length + " checked";
+
+  if (!sorted.length) {
+    container.textContent = "Select meals to build your grocery list.";
+    return;
+  }
+
+  sorted.forEach(([key, qty]) => {
+    const [name, unit] = JSON.parse(key);
+
+    const row = document.createElement("div");
+    row.className = "grocery-row";
+
+    const label = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = checkedItems.has(key);
+
+    const text = document.createElement("span");
+    const formattedQty = Number(qty.toFixed(2));
+    const prefix = qty > 0
+      ? formattedQty + (unit ? " " + unit : "") + " "
+      : "";
+    text.textContent = prefix +
+      name.charAt(0).toUpperCase() + name.slice(1);
+
+    if (checkbox.checked) text.classList.add("checked-text");
+
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) checkedItems.add(key);
+      else checkedItems.delete(key);
+      persist();
+      renderGroceryList();
+    });
+
+    label.append(checkbox, text);
+    row.appendChild(label);
+    container.appendChild(row);
+  });
 }
-function updateGroceryList() {
-const container = document.getElementById('groceryListContainer');
-container.innerHTML = '';
-const aggregatedIngredients = {};
-recipes.forEach(recipe => {
-if (selectedRecipeIds.includes(recipe.id)) {
-recipe.ingredients.forEach(ing => {
-const key = ${ing.name}|${ing.unit};
-if (aggregatedIngredients[key]) {
-aggregatedIngredients[key] += ing.qty;
-} else {
-aggregatedIngredients[key] = ing.qty;
-}
-});
-}
-});
-const keys = Object.keys(aggregatedIngredients);
-if (keys.length === 0) {
-container.innerHTML = 'Select meals to dynamically build your list.';
-return;
-}
-keys.sort().forEach(key => {
-const [name, unit] = key.split('|');
-const totalQty = aggregatedIngredients[key];
-const itemDiv = document.createElement('div');
-itemDiv.className = 'grocery-item';
-const qtyStr = totalQty > 0 ? ${parseFloat(totalQty.toFixed(2))}  : '';
-const unitStr = unit ? ${unit}  : '';
-itemDiv.textContent = • ${qtyStr}${unitStr}${capitalizeFirstLetter(name)};
-container.appendChild(itemDiv);
-});
-}
+
 function exportRecipes() {
-if (recipes.length === 0) {
-alert('No recipes available to export.');
-return;
+  if (!recipes.length) {
+    alert("There are no recipes to export.");
+    return;
+  }
+
+  const blob = new Blob(
+    [JSON.stringify(recipes, null, 2)],
+    { type: "application/json" }
+  );
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "recipe_backup.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(recipes, null, 2));
-const downloadAnchor = document.createElement('a');
-downloadAnchor.setAttribute("href", dataStr);
-downloadAnchor.setAttribute("download", "recipe_backup.json");
-document.body.appendChild(downloadAnchor);
-downloadAnchor.click();
-downloadAnchor.remove();
-}
+
 function importRecipes(event) {
-const file = event.target.files[0];
-if (!file) return;
-const reader = new FileReader();
-reader.onload = function(e) {
-try {
-const importedData = JSON.parse(e.target.result);
-if (Array.isArray(importedData)) {
-recipes = importedData;
-selectedRecipeIds = [];
-saveDataToStorage();
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!Array.isArray(data) || !data.every(r =>
+        r && typeof r.name === "string" &&
+        Array.isArray(r.ingredients)
+      )) {
+        throw new Error("Invalid recipe format.");
+      }
+
+      if (!confirm("Replace your current recipes with the imported recipes?")) {
+        return;
+      }
+
+      recipes = data.map(r => ({
+        id: String(r.id || (Date.now() + Math.random())),
+        name: r.name,
+        ingredients: r.ingredients
+          .filter(i => i && typeof i.name === "string")
+          .map(i => ({
+            name: i.name.trim().toLowerCase(),
+            qty: Number(i.qty) || 0,
+            unit: String(i.unit || "").trim().toLowerCase()
+          }))
+      }));
+
+      selectedIds.clear();
+      checkedItems.clear();
+      persist();
+      renderRecipes();
+      renderGroceryList();
+      alert("Recipes imported successfully!");
+    } catch (error) {
+      alert("Import failed: " + error.message);
+    } finally {
+      event.target.value = "";
+    }
+  };
+  reader.onerror = () => {
+    alert("Unable to read the selected file.");
+    event.target.value = "";
+  };
+  reader.readAsText(file);
+}
+
+el("addIngredientBtn").addEventListener("click", addIngredientRow);
+el("saveRecipeBtn").addEventListener("click", saveRecipe);
+el("exportBtn").addEventListener("click", exportRecipes);
+el("importBtn").addEventListener("click", () => el("importInput").click());
+el("importInput").addEventListener("change", importRecipes);
+el("clearChecksBtn").addEventListener("click", () => {
+  checkedItems.clear();
+  persist();
+  renderGroceryList();
+});
+
+loadData();
+addIngredientRow();
 renderRecipes();
-updateGroceryList();
-alert('Recipes imported successfully!');
-} else {
-alert('Invalid file structure. Expected an array of recipes.');
-}
-} catch (err) {
-alert('Failed to parse file. Ensure it is a valid JSON file.');
-}
-};
-reader.readAsText(file);
-event.target.value = '';
-}
-function capitalizeFirstLetter(string) {
-return string.charAt(0).toUpperCase() + string.slice(1);
-}
-function escapeHtml(str) {
-return str.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, """).replace(/'/g, "'");
-}
+renderGroceryList();
+</script>
+</body>
+</html>
