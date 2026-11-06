@@ -324,7 +324,9 @@ function renderRecipes() {
     return;
   }
 
-  recipes.forEach(recipe => {
+  [...recipes]
+  .sort((a, b) => a.name.localeCompare(b.name))
+  .forEach(recipe => {
     const row = document.createElement("div");
     row.className = "recipe-row";
 
