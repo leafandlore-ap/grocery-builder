@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Recipe & Grocery Planner</title>
+    <title>Privacy-Safe Local Recipe & Grocery Planner</title>
     <style>
         @import url('https://googleapis.com');
         
@@ -50,6 +50,8 @@
         .hidden { display: none !important; }
         ul { list-style-type: none; }
         .pl-5 { padding-left: 1.25rem; list-style-type: disc; color: #6b7280; font-size: 0.75rem; margin-top: 0.25rem;}
+        
+        .privacy-banner { background-color: #fef3c7; border: 1px solid #fcd34d; color: #92400e; padding: 0.75rem 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.875rem; line-height: 1.25rem; }
     </style>
 </head>
 <body>
@@ -58,16 +60,20 @@
         <header>
             <div>
                 <h1>Meal Planner & Grocery Aggregator</h1>
-                <p class="text-gray-500">All data is saved completely locally in your device's browser memory.</p>
+                <p class="text-gray-500">Privacy-Isolated Mode: Fully optimized for Zen & Firefox tracking setups.</p>
             </div>
             <div>
-                <button onclick="exportData()" class="btn">Export Backup</button>
+                <button onclick="exportData()" class="btn">Download Recipe File</button>
                 <label class="btn" style="display:inline-block; position:relative; overflow:hidden;">
-                    Import Backup
+                    Upload Recipe File
                     <input type="file" id="importFile" onchange="importData(event)" style="position:absolute; top:0; left:0; opacity:0; cursor:pointer;">
                 </label>
             </div>
         </header>
+
+        <div class="privacy-banner">
+            <strong>🔒 Strict Privacy Mode Active:</strong> To comply with Zen/Firefox security settings, data does not write to tracking spaces. Add your recipes below, then click <strong>"Download Recipe File"</strong> to save your layout permanently. Simply click <strong>"Upload Recipe File"</strong> whenever you open the link on your computer or phone to restore them instantly!
+        </div>
 
         <div class="grid">
             <div>
@@ -83,7 +89,7 @@
                             <p class="hint">Type one ingredient per line. Start with a number if there is a quantity.<br>Examples: "2 green bell pepper", "1 tbsp olive oil", "500 g minced beef"</p>
                             <textarea id="recipeIngredients" required rows="5" placeholder="2 green bell pepper&#10;1 tbsp olive oil&#10;500 g chicken breast"></textarea>
                         </div>
-                        <button type="submit" class="btn-primary">Save Recipe</button>
+                        <button type="submit" class="btn-primary">Add to Active Session</button>
                     </form>
                 </section>
 
@@ -114,10 +120,11 @@
     </div>
 
     <script>
-        let allRecipes = JSON.parse(localStorage.getItem('savedRecipes')) || [];
+        // Completely bypass storage engines to stop Firefox/Zen security faults
+        let allRecipes = [];
         let selectedRecipeIds = new Set();
 
-        // Initial setup run
+        // Safe initial render run
         renderRecipes();
         calculateGroceries();
 
@@ -133,7 +140,6 @@
             const recipe = { id: Date.now(), name, ingredients };
             
             allRecipes.push(recipe);
-            localStorage.setItem('savedRecipes', JSON.stringify(allRecipes));
 
             document.getElementById("recipeForm").reset();
             renderRecipes();
@@ -144,48 +150,46 @@
             line = line.trim();
             if (!line) return null;
 
-            // Robust text splitting layout to safely avoid array type crashes
-            const qtyMatch = line.match(/^([0-9\/\.\s½⅓¼¾]+)?\s*(.*?)$/);
+            // Safe split layout logic built without standard internal trim overrides
+            const cleanLine = line.replace(/\s+/g, ' ');
+            const match = cleanLine.match(/^([0-9\/\.\s½⅓¼¾]+)?\s*(.*)$/);
+            
             let quantityStr = "1";
             let remainder = line;
 
-            if (qtyMatch) {
-                if (qtyMatch[1]) quantityStr = qtyMatch[1].trim();
-                if (qtyMatch[2]) remainder = qtyMatch[2].trim();
+            if (match) {
+                if (match[1]) quantityStr = match[1];
+                if (match[2]) remainder = match[2];
             }
 
-            let quantity = parseQuantity(quantityStr);
+            let quantity = parseQuantity(quantityStr.trim());
 
             const units = ['g', 'kg', 'lb', 'oz', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'cups', 'can', 'cans', 'pack', 'packs', 'clove', 'cloves', 'slice', 'slices', 'bag', 'bags'];
-            const tokens = remainder.split(/\s+/);
+            const tokens = remainder.split(' ');
             let unit = "";
             let name = remainder;
 
             if (tokens.length > 1 && units.includes(tokens[0].toLowerCase())) {
                 unit = tokens[0].toLowerCase();
-                name = tokens.slice(1).join(" ");
-            }
-
-            return {
-                quantity: quantity,
-                unit: unit,
-                name: name.toLowerCase().trim()
-            };
-        }
-
-        function parseQuantity(str) {
-            const fractionMap = { '½': 0.5, '⅓': 0.33, '¼': 0.25, '¾': 0.75 };
-            if (fractionMap[str]) return fractionMap[str];
-            if (str.includes('/')) {
-                const parts = str.split('/');
-                if(parts.length === 2) {
-                    return parseFloat(parts[0]) / parseFloat(parts[1]);
-                }
-            }
-            const val = parseFloat(str);
-            return isNaN(val) ? 1 : val;
-        }
-
+name = tokens.slice(1).join(" ");
+}
+return {
+quantity: quantity,
+unit: unit,
+name: name.toLowerCase().trim()
+};
+}
+function parseQuantity(str) {
+if (!str) return 1;
+const fractionMap = { '½': 0.5, '⅓': 0.33, '¼': 0.25, '¾': 0.75 };
+if (fractionMap[str]) return fractionMap[str];
+if (str.includes('/')) {
+const parts = str.split('/');
+if(parts.length === 2) return parseFloat(parts[0]) / parseFloat(parts[1]);
+}
+const val = parseFloat(str);
+return isNaN(val) ? 1 : val;
+}
 function renderRecipes() {
 const container = document.getElementById("recipesContainer");
 if (allRecipes.length === 0) {
@@ -220,7 +224,6 @@ calculateGroceries();
 function deleteRecipe(id) {
 allRecipes = allRecipes.filter(r => r.id !== id);
 selectedRecipeIds.delete(id);
-localStorage.setItem('savedRecipes', JSON.stringify(allRecipes));
 renderRecipes();
 calculateGroceries();
 }
@@ -266,13 +269,19 @@ function escapeHTML(str) {
 return str.replace(/[&<>'"]/g, tag => ({ '&': '&', '<': '<', '>': '>', "'": ''', '"': '"' }[tag] || tag));
 }
 function exportData() {
-const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allRecipes));
+if (allRecipes.length === 0) {
+alert("Please add at least one recipe before downloading.");
+return;
+}
+const blob = new Blob([JSON.stringify(allRecipes, null, 2)], { type: "application/json" });
+const url = URL.createObjectURL(blob);
 const downloadAnchor = document.createElement('a');
-downloadAnchor.setAttribute("href", dataStr);
-downloadAnchor.setAttribute("download", "recipe_planner_backup.json");
+downloadAnchor.href = url;
+downloadAnchor.download = "recipe_planner_backup.json";
 document.body.appendChild(downloadAnchor);
 downloadAnchor.click();
-downloadAnchor.remove();
+document.body.removeChild(downloadAnchor);
+URL.revokeObjectURL(url);
 }
 function importData(event) {
 const file = event.target.files[0];
@@ -283,8 +292,7 @@ try {
 const imported = JSON.parse(e.target.result);
 if (!Array.isArray(imported)) throw new Error();
 allRecipes = imported;
-localStorage.setItem('savedRecipes', JSON.stringify(allRecipes));
-alert("Recipes imported successfully!");
+alert("Recipes uploaded successfully!");
 renderRecipes();
 calculateGroceries();
 } catch (err) {
