@@ -114,7 +114,6 @@
     </div>
 
     <script>
-        // Use standard LocalStorage to guarantee instant, serverless saving on file:// and mobile
         let allRecipes = JSON.parse(localStorage.getItem('savedRecipes')) || [];
         let selectedRecipeIds = new Set();
 
@@ -131,7 +130,6 @@
                 .map(line => parseIngredientLine(line))
                 .filter(item => item !== null);
 
-            // Generate an instant, reliable local numerical timestamp ID
             const recipe = { id: Date.now(), name, ingredients };
             
             allRecipes.push(recipe);
@@ -146,19 +144,18 @@
             line = line.trim();
             if (!line) return null;
 
-            // Extract matching quantities cleanly at the front
+            // Robust text splitting layout to safely avoid array type crashes
             const qtyMatch = line.match(/^([0-9\/\.\s½⅓¼¾]+)?\s*(.*?)$/);
-            let quantityStr = qtyMatch ? qtyMatch[1] : "1";
-            let remainder = qtyMatch ? qtyMatch[2] : line;
+            let quantityStr = "1";
+            let remainder = line;
 
-            if (!quantityStr) {
-                quantityStr = "1";
-                remainder = line;
+            if (qtyMatch) {
+                if (qtyMatch[1]) quantityStr = qtyMatch[1].trim();
+                if (qtyMatch[2]) remainder = qtyMatch[2].trim();
             }
 
-            let quantity = parseQuantity(quantityStr.trim());
+            let quantity = parseQuantity(quantityStr);
 
-            // Check standard matching kitchen layout metrics
             const units = ['g', 'kg', 'lb', 'oz', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'cups', 'can', 'cans', 'pack', 'packs', 'clove', 'cloves', 'slice', 'slices', 'bag', 'bags'];
             const tokens = remainder.split(/\s+/);
             let unit = "";
@@ -181,11 +178,14 @@
             if (fractionMap[str]) return fractionMap[str];
             if (str.includes('/')) {
                 const parts = str.split('/');
-return parseFloat(parts[0]) / parseFloat(parts[1]);
-}
-const val = parseFloat(str);
-return isNaN(val) ? 1 : val;
-}
+                if(parts.length === 2) {
+                    return parseFloat(parts[0]) / parseFloat(parts[1]);
+                }
+            }
+            const val = parseFloat(str);
+            return isNaN(val) ? 1 : val;
+        }
+
 function renderRecipes() {
 const container = document.getElementById("recipesContainer");
 if (allRecipes.length === 0) {
@@ -234,7 +234,6 @@ const masterList = {};
 allRecipes.forEach(recipe => {
 if (selectedRecipeIds.has(recipe.id)) {
 recipe.ingredients.forEach(item => {
-// Core requirement matching aggregation check
 const key = ${item.unit}_${item.name};
 if (masterList[key]) {
 masterList[key].quantity += item.quantity;
