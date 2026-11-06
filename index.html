@@ -19,7 +19,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
@@ -112,7 +112,7 @@
             font-size: 0.9rem;
         }
 
-        input[type="text"], input[type="number"], select, textarea {
+        input[type="text"], input[type="number"] {
             width: 100%;
             padding: 8px 12px;
             border: 1px solid var(--border-color);
@@ -176,13 +176,12 @@
     <header>
         <h1>🛒 Grocery Planner</h1>
         <div class="file-buttons">
-            <button class="btn btn-outline" onclick="exportRecipes()">Export JSON</button>
-            <button class="btn btn-outline" onclick="document.getElementById('importInput').click()">Import JSON</button>
-            <input type="file" id="importInput" accept=".json" onchange="importRecipes(event)">
+            <button class="btn btn-outline" id="exportBtn">Export JSON</button>
+            <button class="btn btn-outline" id="importTriggerBtn">Import JSON</button>
+            <input type="file" id="importInput" accept=".json">
         </div>
     </header>
 
-    <!-- Left Column: Add & Select Recipes -->
     <div style="display: flex; flex-direction: column; gap: 20px;">
         <!-- Add Recipe Card -->
         <div class="card">
@@ -194,44 +193,46 @@
             
             <label>Ingredients</label>
             <div id="ingredientInputsContainer">
-                <div class="ingredient-row">
-                    <input type="text" placeholder="Ingredient Name (e.g., Bell Pepper)" class="ing-name">
-                    <input type="number" step="any" placeholder="Qty" class="ing-qty">
-                    <input type="text" placeholder="Unit (e.g., whole, oz)" class="ing-unit">
-                    <button class="btn btn-danger" onclick="this.parentElement.remove()">X</button>
-                </div>
+                <!-- Initial row will be automatically injected by JS -->
             </div>
             
-            <button class="btn btn-outline" style="margin-top: 5px; width: 100%;" onclick="addIngredientRow()">+ Add Ingredient Line</button>
-            <button class="btn" style="margin-top: 15px; width: 100%;" onclick="saveRecipe()">Save Recipe</button>
+            <button class="btn btn-outline" style="margin-top: 10px; width: 100%;" id="addIngredientBtn">+ Add Ingredient Line</button>
+            <button class="btn" style="margin-top: 15px; width: 100%;" id="saveRecipeBtn">Save Recipe</button>
         </div>
 
         <!-- Recipe Inventory Card -->
         <div class="card">
             <h2>Your Meals</h2>
-            <div id="recipeList">
-                <!-- Recipes inject here -->
-            </div>
+            <div id="recipeList"></div>
         </div>
     </div>
 
     <!-- Right Column: Generated Grocery List -->
     <div class="card" style="position: sticky; top: 20px;">
         <h2>Weekly Grocery List</h2>
-        <div id="groceryListContainer" style="margin-top: 15px;">
-            <!-- Aggregated list item elements inject here -->
-        </div>
+        <div id="groceryListContainer" style="margin-top: 15px;"></div>
     </div>
 </div>
 
 <script>
-    // Robust data layer using localStorage (persistent across browser reloads)
     let recipes = [];
-    let selectedRecipeIds = new Set();
+    let selectedRecipeIds = [];
 
-    // Initialize application state on window load
-    window.addEventListener('DOMContentLoaded', () => {
+    // Core Setup & Event Attaching
+    document.addEventListener('DOMContentLoaded', () => {
         loadDataFromStorage();
+        
+        // Explicitly attach events to buttons to guarantee they fire
+        document.getElementById('addIngredientBtn').addEventListener('click', () => addIngredientRow());
+        document.getElementById('saveRecipeBtn').addEventListener('click', saveRecipe);
+        document.getElementById('exportBtn').addEventListener('click', exportRecipes);
+        
+        const fileInput = document.getElementById('importInput');
+        document.getElementById('importTriggerBtn').addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', importRecipes);
+
+        // Inject initial blank ingredient line
+        addIngredientRow();
         renderRecipes();
         updateGroceryList();
     });
@@ -241,7 +242,6 @@
             const stored = localStorage.getItem('local_recipe_manager_data');
             recipes = stored ? JSON.parse(stored) : [];
         } catch (e) {
-            console.error("Failed to parse data from localStorage", e);
             recipes = [];
         }
     }
@@ -258,8 +258,14 @@
             <input type="text" placeholder="Ingredient Name" class="ing-name">
             <input type="number" step="any" placeholder="Qty" class="ing-qty">
             <input type="text" placeholder="Unit" class="ing-unit">
-            <button class="btn btn-danger" onclick="this.parentElement.remove()">X</button>
+            <button class="btn btn-danger remove-row-btn">X</button>
         `;
+        
+        // Attach delete logic explicitly to the row button
+        row.querySelector('.remove-row-btn').addEventListener('click', () => {
+            row.remove();
+        });
+        
         container.appendChild(row);
     }
 
@@ -301,26 +307,25 @@
         // Reset Inputs
         nameInput.value = '';
         document.getElementById('ingredientInputsContainer').innerHTML = '';
-        addIngredientRow(); // Add back one clean starter row
+        addIngredientRow(); 
         
         renderRecipes();
         updateGroceryList();
     }
 
-    function deleteRecipe(id, event) {
-        event.stopPropagation(); // Stop trigger toggles when deleting
+    function deleteRecipe(id) {
         recipes = recipes.filter(r => r.id !== id);
-        selectedRecipeIds.delete(id);
+        selectedRecipeIds = selectedRecipeIds.filter(selectedId => selectedId !== id);
         saveDataToStorage();
         renderRecipes();
         updateGroceryList();
     }
 
     function toggleRecipeSelect(id) {
-        if (selectedRecipeIds.has(id)) {
-            selectedRecipeIds.delete(id);
+        if (selectedRecipeIds.includes(id)) {
+            selectedRecipeIds = selectedRecipeIds.filter(selectedId => selectedId !== id);
         } else {
-            selectedRecipeIds.add(id);
+            selectedRecipeIds.push(id);
         }
         updateGroceryList();
     }
@@ -334,20 +339,30 @@ listContainer.innerHTML = 'No recipes saved yet.';
 return;
 }
 recipes.forEach(recipe => {
-const isChecked = selectedRecipeIds.has(recipe.id) ? 'checked' : '';
+const isChecked = selectedRecipeIds.includes(recipe.id);
 const item = document.createElement('div');
 item.className = 'recipe-list-item';
-item.innerHTML = <div class="recipe-info" onclick="toggleRecipeSelect('${recipe.id}'); document.getElementById('check-${recipe.id}').checked = !document.getElementById('check-${recipe.id}').checked"> <input type="checkbox" id="check-${recipe.id}" ${isChecked} onclick="event.stopPropagation(); toggleRecipeSelect('${recipe.id}')"> <span>${escapeHtml(recipe.name)}</span> </div> <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8rem;" onclick="deleteRecipe('${recipe.id}', event)">Delete</button>;
+item.innerHTML = <div class="recipe-info"> <input type="checkbox" class="recipe-checkbox" ${isChecked ? 'checked' : ''}> <span>${escapeHtml(recipe.name)}</span> </div> <button class="btn btn-danger delete-recipe-btn" style="padding: 4px 8px; font-size: 0.8rem;">Delete</button>;
+// Isolated event listening to fix previous click bubble bugs
+item.querySelector('.recipe-info').addEventListener('click', (e) => {
+if (e.target.type !== 'checkbox') {
+const cb = item.querySelector('.recipe-checkbox');
+cb.checked = !cb.checked;
+}
+toggleRecipeSelect(recipe.id);
+});
+item.querySelector('.delete-recipe-btn').addEventListener('click', () => {
+deleteRecipe(recipe.id);
+});
 listContainer.appendChild(item);
 });
 }
 function updateGroceryList() {
 const container = document.getElementById('groceryListContainer');
 container.innerHTML = '';
-// Map key format: "ingredient_name|unit" -> total quantity
 const aggregatedIngredients = {};
 recipes.forEach(recipe => {
-if (selectedRecipeIds.has(recipe.id)) {
+if (selectedRecipeIds.includes(recipe.id)) {
 recipe.ingredients.forEach(ing => {
 const key = ${ing.name}|${ing.unit};
 if (aggregatedIngredients[key]) {
@@ -368,14 +383,12 @@ const [name, unit] = key.split('|');
 const totalQty = aggregatedIngredients[key];
 const itemDiv = document.createElement('div');
 itemDiv.className = 'grocery-item';
-// Format string output clearly based on values provided
 const qtyStr = totalQty > 0 ? ${parseFloat(totalQty.toFixed(2))}  : '';
 const unitStr = unit ? ${unit}  : '';
 itemDiv.textContent = • ${qtyStr}${unitStr}${capitalizeFirstLetter(name)};
 container.appendChild(itemDiv);
 });
 }
-// Export state data structure directly to native filesystem download
 function exportRecipes() {
 if (recipes.length === 0) {
 alert('No recipes available to export.');
@@ -389,7 +402,6 @@ document.body.appendChild(downloadAnchor);
 downloadAnchor.click();
 downloadAnchor.remove();
 }
-// Import and parse validated data structure safely back into storage context
 function importRecipes(event) {
 const file = event.target.files[0];
 if (!file) return;
@@ -398,9 +410,8 @@ reader.onload = function(e) {
 try {
 const importedData = JSON.parse(e.target.result);
 if (Array.isArray(importedData)) {
-// Simple alignment check to ensure data structure compatibility
 recipes = importedData;
-selectedRecipeIds.clear();
+selectedRecipeIds = [];
 saveDataToStorage();
 renderRecipes();
 updateGroceryList();
@@ -413,7 +424,6 @@ alert('Failed to parse file. Ensure it is a valid JSON file.');
 }
 };
 reader.readAsText(file);
-// Clear value so the same file can be chosen repeatedly if fixed
 event.target.value = '';
 }
 function capitalizeFirstLetter(string) {
