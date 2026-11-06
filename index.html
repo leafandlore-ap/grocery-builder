@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Grocery Planner</title>
+<title>Grocery Builder</title>
 <style>
 :root{color-scheme:dark;--bg:#111820;--card:#1c2732;--text:#edf3f5;--accent:#63c5bb;--hover:#367f7a;--border:#394958;--danger:#c34c55;--input:#263440;--muted:#afbec8;--button-text:#102323}
 :root[data-theme="light"]{color-scheme:light;--bg:#f4f7f6;--card:#fff;--text:#333;--accent:#2c7a7b;--hover:#236162;--border:#e2e8f0;--danger:#e53e3e;--input:#fff;--muted:#66717b;--button-text:#fff}
@@ -17,7 +17,7 @@ button{border:0;background:var(--accent);color:var(--button-text);padding:9px 14
 </head>
 <body>
 <div class="container">
-<header><h1>🛒 Grocery Planner</h1><div class="actions"><button class="outline" id="themeBtn" type="button" aria-label="Switch to light mode">☀️ Light mode</button><button class="outline" id="exportBtn" type="button">Export JSON</button><button class="outline" id="importBtn" type="button">Import JSON</button><input type="file" id="importInput" accept=".json,application/json"></div></header>
+<header><h1>🍎 Grocery Builder</h1><div class="actions"><button class="outline" id="themeBtn" type="button" aria-label="Switch to light mode">☀️ Light mode</button><button class="outline" id="exportBtn" type="button">Export JSON</button><button class="outline" id="importBtn" type="button">Import JSON</button><input type="file" id="importInput" accept=".json,application/json"></div></header>
 <div class="left-column">
 <section class="card"><h2 id="formTitle">Add New Recipe</h2><label class="field-label" for="recipeName">Recipe Name</label><input id="recipeName" type="text" placeholder="e.g., Spaghetti Carbonara"><label class="field-label" for="recipeCuisine">Cuisine (optional)</label><input id="recipeCuisine" type="text" list="cuisineSuggestions" placeholder="e.g., Italian"><datalist id="cuisineSuggestions"></datalist><label class="field-label">Ingredients</label><div id="ingredientInputs"></div><button class="outline full" id="addIngredientBtn" type="button">+ Add Ingredient Line</button><button class="full" id="saveRecipeBtn" type="button">Save Recipe</button><button class="outline full" id="cancelEditBtn" type="button" hidden>Cancel Editing</button><div id="notice" role="status"></div></section>
 <section class="card"><h2>Your Meals</h2><div class="filters" id="cuisineFilters" aria-label="Filter recipes by cuisine"></div><div id="recipeList"></div></section>
